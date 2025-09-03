@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz | Fundamentos da Web</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo">QZ</div>
+        <div class="brand-title">Quiz Dashboard</div>
+      </div>
+      <nav class="menu">
+        <button id="btn-shuffle" class="menu-item">Embaralhar questões</button>
+        <button id="btn-reset" class="menu-item warning">Limpar respostas</button>
+        <button id="btn-export" class="menu-item">Exportar respostas (JSON)</button>
+      </nav>
+      <div class="meta">
+        <div class="meta-row">
+          <span>Questões</span>
+          <strong id="meta-total">10</strong>
+        </div>
+        <div class="meta-row">
+          <span>Respondidas</span>
+          <strong id="meta-answered">0</strong>
+        </div>
+        <div class="meta-row">
+          <span>Corretas</span>
+          <strong id="meta-correct">0</strong>
+        </div>
+        <div class="meta-row">
+          <span>Peso total</span>
+          <strong id="meta-weight">10</strong>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="title-group">
+          <h1>Fundamentos da Web</h1>
+          <p>HTML, CSS e JavaScript — 10 questões objetivas</p>
+        </div>
+        <div class="status-cards">
+          <div class="card">
+            <div class="card-label">Tempo desta questão</div>
+            <div class="card-value">
+              <span id="time-mm">03</span>:<span id="time-ss">00</span>
+            </div>
+            <div class="progress">
+              <div id="time-progress" class="progress-bar"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-label">Progresso</div>
+            <div class="card-value"><span id="progress-cur">1</span>/<span id="progress-total">10</span></div>
+            <div class="progress">
+              <div id="quiz-progress" class="progress-bar"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-label">Pontuação</div>
+            <div class="card-value"><span id="score">0</span></div>
+          </div>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="question-card">
+          <div class="question-header">
+            <div class="q-id">Q<span id="q-index">1</span></div>
+            <div class="q-weight">Peso: <span id="q-weight">1</span></div>
+          </div>
+          <h2 id="q-text">Carregando...</h2>
+          <ul id="options" class="options"></ul>
+          <div class="actions">
+            <button id="btn-prev" class="ghost" disabled>Anterior</button>
+            <button id="btn-next" class="primary">Próxima</button>
+            <button id="btn-submit" class="success">Enviar prova</button>
+          </div>
+          <div class="hint" id="hint"></div>
+        </div>
+
+        <div class="results-card" id="results" hidden>
+          <h2>Resultado</h2>
+          <p>Acertos: <strong id="res-correct">0</strong> de <strong id="res-total">10</strong></p>
+          <p>Nota (soma dos pesos corretos): <strong id="res-grade">0</strong></p>
+          <button id="btn-restart" class="primary">Reiniciar</button>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <small>Regras: 1) Cada questão tem peso definido; a nota final é a soma dos pesos. 2) Objetivas: 5 alternativas (A–E) e apenas uma correta. 3) Discursivas: avaliadas manualmente após o envio. 4) Em caso de tempo esgotado, a prova avança automaticamente.</small>
+      </footer>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
