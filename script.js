@@ -147,21 +147,22 @@ const QUESTIONS = [
   }
 ];
 
-// =====================
-// Estado
-// =====================
 
+
+
+/* =====================
+   Estado
+   ===================== */
 let order = [...Array(QUESTIONS.length).keys()];
 let current = 0;
 let selected = new Array(QUESTIONS.length).fill(null);
 let correctCount = 0;
 let timer = null;
-let remaining = SECONDS_PER_QUESTION;
+let remaining = SECONDS_PER_QUESTION;[1]
 
-// =====================
-// Elementos
-// =====================
-
+/* =====================
+   Elementos (com tolerância)
+   ===================== */
 const qIndexEl = document.getElementById("q-index");
 const qWeightEl = document.getElementById("q-weight");
 const qTextEl = document.getElementById("q-text");
@@ -170,7 +171,7 @@ const hintEl = document.getElementById("hint");
 
 const metaTotalEl = document.getElementById("meta-total");
 const metaAnsweredEl = document.getElementById("meta-answered");
-const metaCorrectEl = document.getElementById("meta-correct"); // será removido
+const metaCorrectEl = document.getElementById("meta-correct"); // pode não existir
 const metaWeightEl = document.getElementById("meta-weight");
 
 const timeMMEl = document.getElementById("time-mm");
@@ -181,15 +182,15 @@ const progressCurEl = document.getElementById("progress-cur");
 const progressTotalEl = document.getElementById("progress-total");
 const quizProgressEl = document.getElementById("quiz-progress");
 
-const scoreEl = document.getElementById("score"); // será removido
+const scoreEl = document.getElementById("score"); // pode não existir
 
 const btnPrev = document.getElementById("btn-prev");
 const btnNext = document.getElementById("btn-next");
 const btnSubmit = document.getElementById("btn-submit");
 
-const btnShuffle = document.getElementById("btn-shuffle"); // será removido
+const btnShuffle = document.getElementById("btn-shuffle"); // pode não existir
 const btnReset = document.getElementById("btn-reset");
-const btnExport = document.getElementById("btn-export"); // será removido
+const btnExport = document.getElementById("btn-export"); // pode não existir
 
 const resultsCard = document.getElementById("results");
 const resCorrectEl = document.getElementById("res-correct");
@@ -197,45 +198,34 @@ const resTotalEl = document.getElementById("res-total");
 const resGradeEl = document.getElementById("res-grade");
 const btnRestart = document.getElementById("btn-restart");
 
-// =====================
-// Inicialização
-// =====================
+// Novos campos (opcionais no HTML)
+const studentNameEl = document.getElementById("student-name");
+const studentClassEl = document.getElementById("student-class");[1]
 
+/* =====================
+   Inicialização
+   ===================== */
 function init() {
   // Totais
-  metaTotalEl.textContent = QUESTIONS.length;
-  progressTotalEl.textContent = QUESTIONS.length;
-  document.getElementById("progress-cur").textContent = 1;
-  metaWeightEl.textContent = QUESTIONS.reduce((s, q) => s + q.weight, 0);
+  metaTotalEl && (metaTotalEl.textContent = QUESTIONS.length);
+  progressTotalEl && (progressTotalEl.textContent = QUESTIONS.length);
+  progressCurEl && (progressCurEl.textContent = 1);
+  metaWeightEl && (metaWeightEl.textContent = QUESTIONS.reduce((s, q) => s + q.weight, 0));[1]
 
-  // Remoções de UI solicitadas
-  // 1) Botão Exportar respostas (JSON)
+  // Remoções de UI, se existirem
   btnExport?.remove();
-  // 2) Botão Embaralhar questões
   btnShuffle?.remove();
-  // 3) Linha "Corretas" no canto inferior esquerdo
-  //    Remove a linha inteira que contém o #meta-correct
-  if (metaCorrectEl) {
-    const row = metaCorrectEl.closest(".meta-row");
-    row?.remove();
-  }
-  // 4) Cartão/indicador "Pontuação" no topo direito
-  if (scoreEl) {
-    const scoreCard = scoreEl.closest(".card");
-    scoreCard?.remove();
-  }
+  metaCorrectEl?.closest(".meta-row")?.remove();
+  scoreEl?.closest(".card")?.remove();[1]
 
   render();
   startTimer();
 }
+document.addEventListener("DOMContentLoaded", init);[1]
 
-// Garante init após DOM pronto
-document.addEventListener("DOMContentLoaded", init);
-
-// =====================
-// Timer por questão
-// =====================
-
+/* =====================
+   Timer por questão
+   ===================== */
 function startTimer() {
   clearInterval(timer);
   remaining = SECONDS_PER_QUESTION;
@@ -257,78 +247,71 @@ function startTimer() {
 }
 
 function updateTimeUI() {
-  const mm = Math.floor(remaining / 60)
-    .toString()
-    .padStart(2, "0");
+  const mm = Math.floor(remaining / 60).toString().padStart(2, "0");
   const ss = (remaining % 60).toString().padStart(2, "0");
-  timeMMEl.textContent = mm;
-  timeSSEl.textContent = ss;
-  const pct =
-    ((SECONDS_PER_QUESTION - remaining) / SECONDS_PER_QUESTION) * 100;
-  timeProgressEl.style.width = `${pct}%`;
+  if (timeMMEl) timeMMEl.textContent = mm;
+  if (timeSSEl) timeSSEl.textContent = ss;
+  const pct = ((SECONDS_PER_QUESTION - remaining) / SECONDS_PER_QUESTION) * 100;
+  if (timeProgressEl) timeProgressEl.style.width = `${pct}%`;[1]
 }
 
-// =====================
-// Renderização
-// =====================
-
+/* =====================
+   Renderização
+   ===================== */
 function render() {
   const q = QUESTIONS[order[current]];
 
   // Cabeçalho
-  qIndexEl.textContent = current + 1;
-  qWeightEl.textContent = q.weight;
-  qTextEl.textContent = q.text;
+  if (qIndexEl) qIndexEl.textContent = current + 1;
+  if (qWeightEl) qWeightEl.textContent = q.weight;
+  if (qTextEl) qTextEl.textContent = q.text;
 
   // Opções
-  optionsEl.innerHTML = "";
-  q.options.forEach((opt, idx) => {
-    const li = document.createElement("li");
-    li.className = "option";
-
-    const input = document.createElement("input");
-    input.type = "radio";
-    input.name = "opt";
-    input.id = `opt-${current}-${idx}`;
-    input.checked = selected[order[current]] === idx;
-    input.addEventListener("change", () => {
-      selected[order[current]] = idx;
-      updateMeta();
-      hintEl.textContent =
-        "Resposta registrada. É possível trocar antes de enviar.";
+  if (optionsEl) {
+    optionsEl.innerHTML = "";
+    q.options.forEach((opt, idx) => {
+      const li = document.createElement("li");
+      li.className = "option";
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "opt";
+      input.id = `opt-${current}-${idx}`;
+      input.checked = selected[order[current]] === idx;
+      input.addEventListener("change", () => {
+        selected[order[current]] = idx;
+        updateMeta();
+        if (hintEl) hintEl.textContent = "Resposta registrada. É possível trocar antes de enviar.";
+      });
+      const label = document.createElement("label");
+      label.htmlFor = input.id;
+      label.className = "label";
+      label.textContent = `(${String.fromCharCode(65 + idx)}) ${opt}`;
+      li.appendChild(input);
+      li.appendChild(label);
+      optionsEl.appendChild(li);
     });
-
-    const label = document.createElement("label");
-    label.htmlFor = input.id;
-    label.className = "label";
-    label.textContent = `(${String.fromCharCode(65 + idx)}) ${opt}`;
-
-    li.appendChild(input);
-    li.appendChild(label);
-    optionsEl.appendChild(li);
-  });
+  }
 
   // Navegação
-  btnPrev.disabled = current === 0;
-  btnNext.disabled = current === QUESTIONS.length - 1;
+  if (btnPrev) btnPrev.disabled = current === 0;
+  if (btnNext) btnNext.disabled = current === QUESTIONS.length - 1;
 
   // Progresso
-  progressCurEl.textContent = current + 1;
+  if (progressCurEl) progressCurEl.textContent = current + 1;
   const progressPct = ((current + 1) / QUESTIONS.length) * 100;
-  quizProgressEl.style.width = `${progressPct}%`;
+  if (quizProgressEl) quizProgressEl.style.width = `${progressPct}%`;
 
   // Atualizações de meta
   updateMeta();
 
   // Estado resultados
-  resultsCard.hidden = true;
-  btnSubmit.style.display = "inline-block";
+  if (resultsCard) resultsCard.hidden = true;
+  if (btnSubmit) btnSubmit.style.display = "inline-block";
 }
 
-// =====================
-// Navegação
-// =====================
-
+/* =====================
+   Navegação
+   ===================== */
 function goNext() {
   if (current < QUESTIONS.length - 1) {
     current++;
@@ -338,7 +321,6 @@ function goNext() {
     submitQuiz();
   }
 }
-
 function goPrev() {
   if (current > 0) {
     current--;
@@ -346,32 +328,30 @@ function goPrev() {
     startTimer();
   }
 }
-
-btnNext.addEventListener("click", goNext);
-btnPrev.addEventListener("click", goPrev);
+btnNext?.addEventListener("click", goNext);
+btnPrev?.addEventListener("click", goPrev);
 
 // Limpar respostas
-btnReset.addEventListener("click", () => {
+btnReset?.addEventListener("click", () => {
   if (confirm("Deseja limpar todas as respostas?")) {
     selected.fill(null);
     correctCount = 0;
     current = 0;
     render();
     startTimer();
-    hintEl.textContent = "Respostas limpas.";
+    if (hintEl) hintEl.textContent = "Respostas limpas.";
   }
 });
 
 // Submeter prova
-btnSubmit.addEventListener("click", submitQuiz);
+btnSubmit?.addEventListener("click", submitQuiz);
 
-// =====================
-// Avaliação e resultados
-// =====================
-
+/* =====================
+   Avaliação e resultados
+   ===================== */
 function updateMeta() {
   const answered = selected.filter((v) => v !== null).length;
-  metaAnsweredEl.textContent = answered;
+  if (metaAnsweredEl) metaAnsweredEl.textContent = answered;[1]
 }
 
 function evaluate() {
@@ -390,33 +370,34 @@ function submitQuiz() {
   clearInterval(timer);
   const { correct, grade } = evaluate();
   correctCount = correct;
-
-  // Não atualiza metaCorrectEl nem scoreEl (foram removidos)
   showResults(correct, grade);
 }
 
 function showResults(correct, grade) {
-  document
-    .querySelector(".question-card")
-    .scrollIntoView({ behavior: "smooth", block: "start" });
-  document.querySelector(".question-card").style.display = "none";
-  resultsCard.hidden = false;
-  resCorrectEl.textContent = correct;
-  resTotalEl.textContent = QUESTIONS.length;
-  resGradeEl.textContent = grade;
-  btnSubmit.style.display = "none";
-}
+  document.querySelector(".question-card")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const qc = document.querySelector(".question-card");
+  if (qc) qc.style.display = "none";
 
-// =====================
-// Utilidades
-// =====================
+  if (resultsCard) resultsCard.hidden = false;
+  if (resCorrectEl) resCorrectEl.textContent = correct;
+  if (resTotalEl) resTotalEl.textContent = QUESTIONS.length;
+  if (resGradeEl) resGradeEl.textContent = grade;
+  if (btnSubmit) btnSubmit.style.display = "none";
 
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+  // Exibe identificação se existir
+  const name = studentNameEl?.value?.trim();
+  const turma = studentClassEl?.value?.trim();
+  if (resultsCard) {
+    let hdr = resultsCard.querySelector("#results-header");
+    if (!hdr) {
+      hdr = document.createElement("p");
+      hdr.id = "results-header";
+      hdr.style.marginTop = "0";
+      hdr.style.color = "var(--muted)";
+      resultsCard.insertBefore(hdr, resultsCard.firstChild);
+    }
+    hdr.textContent = name || turma ? `${name || "Aluno"}${turma ? " — " + turma : ""}` : "";
   }
-  return arr;
 }
 
 // Reiniciar do cartão de resultados
@@ -425,8 +406,9 @@ btnRestart?.addEventListener("click", () => {
   order = [...Array(QUESTIONS.length).keys()];
   current = 0;
   correctCount = 0;
-  document.querySelector(".question-card").style.display = "";
-  resultsCard.hidden = true;
+  const qc = document.querySelector(".question-card");
+  if (qc) qc.style.display = "";
+  if (resultsCard) resultsCard.hidden = true;
   render();
   startTimer();
 });
